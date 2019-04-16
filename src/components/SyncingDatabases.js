@@ -1,26 +1,48 @@
 import React,{Component} from 'react';
-import {StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+import {StyleSheet, View, Text, ActivityIndicator, Modal } from 'react-native';
 
-export default class SyncingDatabases extends Component {
+export default class SyncingDatabases extends React.PureComponent {
+
+    constructor(props){
+        super(props);
+        this.state = {
+            isShowing: this.props.visible
+        }
+    }
+
+    static getDerivedStateFromProps(props, state) {
+        const newState = {};
+        if (state.isShowing !== props.visible) 
+            newState.isShowing = props.visible;
+    
+        return newState;
+      }
 
     render(){
         return (
-            <View style={styles.syncing}>
-                <Text style = {{fontSize: 18}}>
-                    Syncing Databases
-                </Text>
-                <ActivityIndicator size = {50} color="#0000ff" />
-            </View>
-        )
+            <Modal
+                transparent = {true}
+                visible = {this.state.isShowing}
+            >
+                <View style={styles.syncing}>
+                    <Text style = {{fontSize: 18,fontWeight: 'bold'}}>
+                        Syncing Databases
+                    </Text>
+                    <ActivityIndicator size = {50} color="#0000ff" />
+                </View>
+            </Modal>     
+        ) 
     }
 }
 
 styles = {
     syncing: {
-        flex: 1,
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#474747',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
     }
 }

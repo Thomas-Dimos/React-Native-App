@@ -14,9 +14,7 @@ export default class LoginScreen extends React.Component{
         this.state = {
             username: '',
             password: ''
-        }
-
-        
+        } 
     }
 
     userSignin = () => {
@@ -27,7 +25,7 @@ export default class LoginScreen extends React.Component{
         const userInfo = {username: this.state.username, password: this.state.password};
         NetInfo.isConnected.fetch().then((isConnected) => {
             if(!isConnected) {
-                Alert.alert('You must be connected to the Internet in order to register');
+                Alert.alert('You must be connected to the Internet in order to log in');
                 this.props.navigation.navigate('LoginScreen');
                 return;
             }

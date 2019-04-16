@@ -38,11 +38,26 @@ import HttpRequest from './HTTPRequest';
         });
     }*/
 
-    syncDatabases = (user) => {
+    isDatabasesSynced = (user) => new Promise ((resolve,reject) => {
+        this.db.transaction((tx) => {
+            tx.executeSql(`SELECT Event_id FROM Event,UnsentEvents WHERE Event_id = UnsentEvent_id AND user = "${user}" LIMIT 1`,[],(tx,results) => {
+                if(results.rows.length === 0){
+                    console.log('Databases are synchronized');
+                    resolve(true);
+                }else{
+                    resolve(false);
+                }
+            },() => reject());
+        });
+    })
+
+    syncDatabases = (user) => new Promise ((resolve,reject) => {
+        let eventsSynced = 0;
         this.db.transaction((tx) => {
             tx.executeSql(`SELECT Event_id, eventType, timeStamp, speed, heading, accuracy, altitude, longitude, latitude, data FROM Event,UnsentEvents WHERE Event_id = UnsentEvent_id AND user = "${user}"`,[],(tx,results) => {
                 if(results.rows.length === 0){
                     console.log('Databases are synchronized');
+                    resolve();
                     return;
                 }
 
@@ -55,18 +70,28 @@ import HttpRequest from './HTTPRequest';
                         HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/QREvents/new',newEvent).then((res) => {
                             if(res.status === 200){
                                 this.deleteSendEvent(results.rows.item(i).Event_id);
+                                eventsSynced ++;
+                                if( eventsSynced === results.rows.length ){
+                                    resolve();
+                                }
                             }
                         }).catch((err) => {
                             console.log("Couldn't send Event with id: " + results.rows.item(i).Event_id);
+                            reject();
                         });
                     }else if (results.rows.item(i).eventType === 'BeaconEvent'){
                         HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/BeaconEvents/new',newEvent).then((res) => {
                             if(res.status === 200){
                                 this.deleteSendEvent(results.rows.item(i).Event_id);
+                                eventsSynced ++;
+                                if( eventsSynced === results.rows.length ){
+                                    resolve();
+                                }
                             }
                         }).catch((err) => {
                             console.log("Couldn't send Event with id: " + results.rows.item(i).Event_id);
-                        });;
+                            reject();
+                        });
                     }else{
                         console.log('Unexpected error while preparing to send the Event in syncDatabases');
                         return
@@ -74,7 +99,7 @@ import HttpRequest from './HTTPRequest';
                 }
             })
         });
-    }
+    });
 
     deleteSendEvent = (sentEventID) => {
         this.db.transaction((tx) => {

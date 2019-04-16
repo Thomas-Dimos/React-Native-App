@@ -17,7 +17,6 @@ export default class HomeScreen extends React.Component {
             showLoading: false
         }
         previousState = '';
-        
         //localDatabase.dropTables();
     }
     static navigationOptions = ({navigation}) => {
@@ -49,7 +48,6 @@ export default class HomeScreen extends React.Component {
     }
 
     componentDidMount() {
-        
         this.requestLocationPermission().then(() => {
             AsyncStorage.getItem('currentUser').then((username) => {
                 this.props.navigation.setParams({title: username});
@@ -95,10 +93,8 @@ export default class HomeScreen extends React.Component {
         }else{
             return (
                 <View style={styles.container}>
-    
-                    {
-                        this.state.showLoading ? <SyncingDatabases /> : null
-                    }
+
+                    <SyncingDatabases visible= {this.state.showLoading}/>
                     
                     <View style={styles.map}>
     
@@ -138,25 +134,31 @@ export default class HomeScreen extends React.Component {
                 </View>
             ); 
         }
-       
-        
     }
 
     handleConnectivityChange = (connectionInfo) => {
 
         if(connectionInfo.type === 'wifi' && previousState !== 'wifi'){
             console.log('Syncing databases');
-            this.setState({showLoading: true});
-          localDatabase.syncDatabases(this.props.navigation.getParam('title')).then(() => {
-              this.setState({showLoading: false});
-          });
-          
-        }
-        previousState = connectionInfo.type;
+            localDatabase.isDatabasesSynced(this.props.navigation.getParam('title')).then((res) => {
+                if(!res){
+                    this.setState({showLoading: true});
+                    localDatabase.syncDatabases(this.props.navigation.getParam('title')).then(() => {
+                    this.setState({showLoading: false});
+                    }).catch(() => {
+                            this.setState({showLoading: false});
+                            Alert.alert("Some events couldn't be sent");
+                    })
+                }
+            }).catch(() => {
+                console.log('Error in handleConnectivity');
+            })
       }
-
+      previousState = connectionInfo.type; 
+    }
+    
     componentWillUnmount() {
-        NetInfo.removeEventListener('connectionChange',this.handleConnectivityChange);
+        //NetInfo.removeEventListener('connectionChange',this.handleConnectivityChange);
     }
 
     requestLocationPermission = async () => {
