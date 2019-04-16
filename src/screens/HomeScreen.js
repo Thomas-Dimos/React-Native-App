@@ -17,7 +17,6 @@ export default class HomeScreen extends React.Component {
             showLoading: false
         }
         previousState = '';
-        
         //localDatabase.dropTables();
     }
     static navigationOptions = ({navigation}) => {
@@ -49,7 +48,6 @@ export default class HomeScreen extends React.Component {
     }
 
     componentDidMount() {
-        
         this.requestLocationPermission().then(() => {
             AsyncStorage.getItem('currentUser').then((username) => {
                 this.props.navigation.setParams({title: username});
@@ -92,63 +90,75 @@ export default class HomeScreen extends React.Component {
     render(){
         if(!this.state.renderMap ){
             return null
-        }else if (this.state.showLoading){
+        }else{
             return (
-                <SyncingDatabases />
-            )
+                <View style={styles.container}>
+
+                    <SyncingDatabases visible= {this.state.showLoading}/>
+                    
+                    <View style={styles.map}>
+    
+                    </View>
+    
+                    <View style={styles.buttons}>
+    
+                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('BeaconScanningScreen')}>
+    
+                            <Image
+                                style = {{flex: 0.2,aspectRatio: 1.5}}
+                                source={require('../icons/beacon_blue.png')}
+                                resizeMode = 'contain'
+                            />
+    
+                            <Text style = {{fontSize: 12,position: 'relative',right: 22}}>
+                               Beacon scanning
+                            </Text>
+    
+                        </TouchableOpacity>
+    
+                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('QRscanningScreen')}>
+    
+                            <Image
+                                style = {{flex: 0.2, aspectRatio: 1.5}}
+                                source={require('../icons/qr_icon.png')}
+                                resizeMode = 'contain'
+                            />
+    
+                            <Text style = {{fontSize: 12,position: 'relative',right: 15}}>
+                                QR scanning
+                            </Text>
+    
+                        </TouchableOpacity>
+    
+                    </View>
+                </View>
+            ); 
         }
-        return (
-            <View style={styles.container}>
-                <View style={styles.map}>
-
-                </View>
-
-                <View style={styles.buttons}>
-
-                    <TouchableOpacity onPress = {() => this.props.navigation.navigate('BeaconScanningScreen')}>
-
-                        <Image
-                            style = {{flex: 0.2,aspectRatio: 1.5}}
-                            source={require('../icons/beacon_blue.png')}
-                            resizeMode = 'contain'
-                        />
-
-                        <Text style = {{fontSize: 12,position: 'relative',right: 22}}>
-                           Beacon scanning
-                        </Text>
-
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress = {() => this.props.navigation.navigate('QRscanningScreen')}>
-
-                        <Image
-                            style = {{flex: 0.2, aspectRatio: 1.5}}
-                            source={require('../icons/qr_icon.png')}
-                            resizeMode = 'contain'
-                        />
-
-                        <Text style = {{fontSize: 12,position: 'relative',right: 15}}>
-                            QR scanning
-                        </Text>
-
-                    </TouchableOpacity>
-
-                </View>
-            </View>
-        ); 
     }
 
     handleConnectivityChange = (connectionInfo) => {
 
         if(connectionInfo.type === 'wifi' && previousState !== 'wifi'){
             console.log('Syncing databases');
-          localDatabase.syncDatabases(this.props.navigation.getParam('title'));
-        }
-        previousState = connectionInfo.type;
+            localDatabase.isDatabasesSynced(this.props.navigation.getParam('title')).then((res) => {
+                if(!res){
+                    this.setState({showLoading: true});
+                    localDatabase.syncDatabases(this.props.navigation.getParam('title')).then(() => {
+                    this.setState({showLoading: false});
+                    }).catch(() => {
+                            this.setState({showLoading: false});
+                            Alert.alert("Some events couldn't be sent");
+                    })
+                }
+            }).catch(() => {
+                console.log('Error in handleConnectivity');
+            })
       }
-
+      previousState = connectionInfo.type; 
+    }
+    
     componentWillUnmount() {
-        NetInfo.removeEventListener('connectionChange',this.handleConnectivityChange);
+        //NetInfo.removeEventListener('connectionChange',this.handleConnectivityChange);
     }
 
     requestLocationPermission = async () => {
