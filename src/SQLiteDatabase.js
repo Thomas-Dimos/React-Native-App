@@ -38,55 +38,43 @@ import HttpRequest from './HTTPRequest';
         });
     }*/
 
-    syncDatabases = (user) => new Promise ((resolve,reject) => {
+    syncDatabases = (user) => {
         this.db.transaction((tx) => {
             tx.executeSql(`SELECT Event_id, eventType, timeStamp, speed, heading, accuracy, altitude, longitude, latitude, data FROM Event,UnsentEvents WHERE Event_id = UnsentEvent_id AND user = "${user}"`,[],(tx,results) => {
                 if(results.rows.length === 0){
                     console.log('Databases are synchronized');
-                    resolve();
+                    return;
                 }
-                let counter = 0;
-                while(counter < results.rows.length ){
-                    const newEvent = new Event(results.rows.item(counter).data,results.rows.item(counter).eventType);
-                    newEvent.setLocation({coords: {speed: results.rows.item(counter).speed,heading: results.rows.item(counter).heading, accuracy: results.rows.item(counter).accuracy, altitude: results.rows.item(counter).altitude, longitude: results.rows.item(counter).longitude, latitude: results.rows.item(counter).latitude}});
-                    newEvent.setEventsTimestamp(results.rows.item(counter).timeStamp);
 
-                    if(results.rows.item(counter).eventType === 'QREvent'){
+                for(let i = 0; i < results.rows.length; i++ ){
+                    const newEvent = new Event(results.rows.item(i).data,results.rows.item(i).eventType);
+                    newEvent.setLocation({coords: {speed: results.rows.item(i).speed,heading: results.rows.item(i).heading, accuracy: results.rows.item(i).accuracy, altitude: results.rows.item(i).altitude, longitude: results.rows.item(i).longitude, latitude: results.rows.item(i).latitude}});
+                    newEvent.setEventsTimestamp(results.rows.item(i).timeStamp);
+
+                    if(results.rows.item(i).eventType === 'QREvent'){
                         HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/QREvents/new',newEvent).then((res) => {
                             if(res.status === 200){
-                                counter ++;
-                                this.deleteSendEvent(results.rows.item(counter).Event_id);
-                                continue;
+                                this.deleteSendEvent(results.rows.item(i).Event_id);
                             }
                         }).catch((err) => {
-                            console.log("Couldn't send Event with id: " + results.rows.item(counter).Event_id);
-                            reject();
-                            break;
+                            console.log("Couldn't send Event with id: " + results.rows.item(i).Event_id);
                         });
-                    }else if (results.rows.item(counter).eventType === 'BeaconEvent'){
+                    }else if (results.rows.item(i).eventType === 'BeaconEvent'){
                         HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/BeaconEvents/new',newEvent).then((res) => {
                             if(res.status === 200){
-                                counter ++;
-                                this.deleteSendEvent(results.rows.item(counter).Event_id);
-                                continue;
+                                this.deleteSendEvent(results.rows.item(i).Event_id);
                             }
                         }).catch((err) => {
-                            console.log("Couldn't send Event with id: " + results.rows.item(counter).Event_id);
-                            reject();
-                            break;
+                            console.log("Couldn't send Event with id: " + results.rows.item(i).Event_id);
                         });;
                     }else{
                         console.log('Unexpected error while preparing to send the Event in syncDatabases');
-                        reject();
-                        break;
+                        return
                     }
                 }
-                resolve();
-
             })
         });
-    }) 
-       
+    }
 
     deleteSendEvent = (sentEventID) => {
         this.db.transaction((tx) => {
