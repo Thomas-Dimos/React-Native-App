@@ -34,7 +34,7 @@ export default class SignupScreen extends React.Component{
                     this.props.navigation.navigate('LoginScreen');
                     return;
                 }
-                HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/sign-up',userInfo).then((res)=>{
+                HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/sign-up','',userInfo).then((res)=>{
                     if (res.status === 200){
                         localDatabase.registerUser(this.state.username);
                         this.props.navigation.navigate('LoginScreen');

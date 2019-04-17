@@ -118,11 +118,12 @@ export default class BeaconScanningScreen extends React.Component {
     sendBeaconEVent = async (beacon) => {
         beaconEvent = new Event(beacon,'BeaconEvent');
         let lastEventID;
+        let user;
         try {
             location = await beaconEvent.getLocation();
             beaconEvent.setLocation(location);
             beaconEvent.setEventsTimestamp(beaconEvent.getEventsTimestamp());
-            const user =  await AsyncStorage.getItem('currentUser');
+            user =  await AsyncStorage.getItem('currentUser');
             await localDatabase.registerEvent(user,beaconEvent);
             lastEventID =  await localDatabase.getLastEventID();
             isConnected = await NetInfo.isConnected.fetch();
@@ -134,7 +135,7 @@ export default class BeaconScanningScreen extends React.Component {
             console.log(error);
             return;
         }
-        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/BeaconEvents/new',beaconEvent).then((res) =>{
+        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/BeaconEvents/new',user,beaconEvent).then((res) =>{
             if (res.status === 200){
                 
                 Alert.alert('Beacon Event was successfully stored in database');

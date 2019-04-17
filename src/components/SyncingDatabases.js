@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {StyleSheet, View, Text, ActivityIndicator, Modal } from 'react-native';
+import { View, Text, ActivityIndicator, Modal } from 'react-native';
 
 export default class SyncingDatabases extends React.PureComponent {
 

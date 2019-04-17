@@ -22,11 +22,13 @@ export default class QRScanningScreen extends React.Component{
         QREvent = new Event (barcodes[barcodes.length-1].data,'QREvent');
         let lastEventID;
         let isConnected;
+        let user;
+        
         try {
             location = await QREvent.getLocation();
             QREvent.setLocation(location);
             QREvent.setEventsTimestamp(QREvent.getEventsTimestamp());
-            const user =  await AsyncStorage.getItem('currentUser');
+            user =  await AsyncStorage.getItem('currentUser');
             await localDatabase.registerEvent(user,QREvent);
             lastEventID =  await localDatabase.getLastEventID();
             isConnected = await NetInfo.isConnected.fetch();
@@ -39,8 +41,7 @@ export default class QRScanningScreen extends React.Component{
             console.log(error);
             return;
         }
-
-        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/QREvents/new',QREvent).then((res) =>{
+        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/QREvents/new',user,QREvent).then((res) =>{
             if (res.status === 200){
                 Alert.alert('QR Event was successfully stored in database');
             }

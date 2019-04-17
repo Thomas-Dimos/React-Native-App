@@ -1,9 +1,32 @@
 import React, {Component} from 'react';
-import {StyleSheet, View,TouchableOpacity,Image, Text, ActivityIndicator,PermissionsAndroid,BackHandler } from 'react-native';
+import {StyleSheet, View,TouchableOpacity,Image, Text,PermissionsAndroid,Alert } from 'react-native';
 import localDatabase from '../SQLiteDatabase';
 import SyncingDatabases from '../components/SyncingDatabases'
 import AsyncStorage from '@react-native-community/async-storage';
 import NetInfo from "@react-native-community/netinfo";
+
+//Pass Netinfo state from this screen to all others by setParam so they don't need to check the wifi state
+
+class HeaderTitle extends Component {
+
+    constructor(props){
+        	super(props);
+    }
+
+    render(){
+        return (
+            <TouchableOpacity
+            style = {{flex:1,alignItems: 'center'}}
+            onPress = {() => this.props.navigation.navigate('UserEvents')}
+            >
+                <Text style = {{fontWeight: 'bold',fontSize: 18,fontFamily:'sans-serif'}}>
+                    {this.props.title}
+                </Text>
+            </TouchableOpacity>
+        )
+    }
+
+}
 
 
 export default class HomeScreen extends React.Component {
@@ -17,16 +40,22 @@ export default class HomeScreen extends React.Component {
             showLoading: false
         }
         previousState = '';
+        const userIcon = require('../icons/user.png');
+        const logoutIcon = require('../icons/logout.png');
+        this.props.navigation.setParams({userIcon: userIcon});
+        this.props.navigation.setParams({logoutIcon: logoutIcon});
+        this.beaconIcon = require('../icons/beacon_blue.png');
+        this.QRIcon = require('../icons/qr_icon.png');
         //localDatabase.dropTables();
     }
     static navigationOptions = ({navigation}) => {
         return {
-            title: navigation.getParam('title'),
+            headerTitle: <HeaderTitle navigation = {navigation} title = {navigation.getParam('title')}/>,
             headerLeft: (
 
                     <Image 
                     style = {{flex:1,width:40,height:30}}
-                    source = { require('../icons/user.png') }
+                    source = {navigation.getParam('userIcon')}
                     resizeMode = 'contain'
                     />
 
@@ -36,14 +65,13 @@ export default class HomeScreen extends React.Component {
                     onPress = {navigation.getParam('logout')}>
                     <Image 
                     style = {{width:45,height:35}}
-                    source = { require('../icons/logout.png') }
+                    source = {navigation.getParam('logoutIcon')}
                     resizeMode = 'contain'
                     />
                 </TouchableOpacity>
             ),
             headerRightContainerStyle: {marginRight: '2%'},
-            headerLeftContainerStyle: {marginLeft: '2%'},
-            headerTitleStyle: {flex:1,textAlign: 'center'}
+            headerLeftContainerStyle: {marginLeft: '2%'}
         }
     }
 
@@ -102,11 +130,11 @@ export default class HomeScreen extends React.Component {
     
                     <View style={styles.buttons}>
     
-                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('BeaconScanningScreen')}>
+                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('BeaconScanningScreen',{token: this.accessToken})}>
     
                             <Image
                                 style = {{flex: 0.2,aspectRatio: 1.5}}
-                                source={require('../icons/beacon_blue.png')}
+                                source={this.beaconIcon}
                                 resizeMode = 'contain'
                             />
     
@@ -116,11 +144,11 @@ export default class HomeScreen extends React.Component {
     
                         </TouchableOpacity>
     
-                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('QRscanningScreen')}>
+                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('QRscanningScreen',{token: this.accessToken})}>
     
                             <Image
                                 style = {{flex: 0.2, aspectRatio: 1.5}}
-                                source={require('../icons/qr_icon.png')}
+                                source= {this.QRIcon}
                                 resizeMode = 'contain'
                             />
     
@@ -143,13 +171,19 @@ export default class HomeScreen extends React.Component {
             localDatabase.isDatabasesSynced(this.props.navigation.getParam('title')).then((res) => {
                 if(!res){
                     this.setState({showLoading: true});
-                    localDatabase.syncDatabases(this.props.navigation.getParam('title')).then(() => {
-                    this.setState({showLoading: false});
-                    }).catch(() => {
+                    localDatabase.getToken(this.props.navigation.getParam('title'),'accessToken').then((accessToken) => {
+                        localDatabase.syncDatabases(this.props.navigation.getParam('title'),this.accessToken).then(() => {
                             this.setState({showLoading: false});
-                            Alert.alert("Some events couldn't be sent");
-                    })
-                }
+                            }).catch(() => {
+                                    this.setState({showLoading: false});
+                                    Alert.alert("Some events couldn't be sent");
+                            })
+                        }).catch((err) => {
+                            console.log(err);
+                            return;
+                        });
+                    
+               }
             }).catch(() => {
                 console.log('Error in handleConnectivity');
             })

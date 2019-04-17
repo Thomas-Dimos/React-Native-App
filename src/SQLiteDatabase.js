@@ -1,4 +1,3 @@
-import React from 'react';
 import SQLite from 'react-native-sqlite-storage';
 import Event from './events/Event';
 import HttpRequest from './HTTPRequest';
@@ -67,7 +66,7 @@ import HttpRequest from './HTTPRequest';
                     newEvent.setEventsTimestamp(results.rows.item(i).timeStamp);
 
                     if(results.rows.item(i).eventType === 'QREvent'){
-                        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/QREvents/new',newEvent).then((res) => {
+                        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/QREvents/new',user,newEvent).then((res) => {
                             if(res.status === 200){
                                 this.deleteSendEvent(results.rows.item(i).Event_id);
                                 eventsSynced ++;
@@ -80,7 +79,7 @@ import HttpRequest from './HTTPRequest';
                             reject();
                         });
                     }else if (results.rows.item(i).eventType === 'BeaconEvent'){
-                        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/BeaconEvents/new',newEvent).then((res) => {
+                        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/BeaconEvents/new',user,newEvent).then((res) => {
                             if(res.status === 200){
                                 this.deleteSendEvent(results.rows.item(i).Event_id);
                                 eventsSynced ++;

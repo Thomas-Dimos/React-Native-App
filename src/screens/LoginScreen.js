@@ -29,7 +29,7 @@ export default class LoginScreen extends React.Component{
                 this.props.navigation.navigate('LoginScreen');
                 return;
             }
-            HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/log-in',userInfo).then(async (res) => {
+            HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/log-in','',userInfo).then(async (res) => {
             if (res.status === 200){
                 const tokens = JSON.parse(res.response);
                 localDatabase.updateUserTokens(this.state.username,tokens);
