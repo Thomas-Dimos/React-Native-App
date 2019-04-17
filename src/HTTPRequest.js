@@ -19,9 +19,9 @@ class HTTPRequest{
             }else if (request.status === 498){ //token expired
                 try{
                     refreshToken = await localDatabase.getToken(user,'refreshToken');
-                    this.sendHTTPRequest('GET','http://192.0.3.76:9999/User/refresh',refreshToken).then(async (res) => {
+                    this.sendHTTPRequest('GET','http://192.0.3.76:9999/User/refresh',user,refreshToken).then(async (res) => {
                         await localDatabase.updateUserAccessToken(user,res.response);
-                        this.sendHTTPRequest(method,URL,data).then((res) => {
+                        this.sendHTTPRequest(method,URL,user,data).then((res) => {
                             resolve({status: 200, response: res});
                         });
                     }).catch((rej) => {
