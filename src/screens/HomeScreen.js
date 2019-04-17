@@ -17,7 +17,7 @@ class HeaderTitle extends Component {
         return (
             <TouchableOpacity
             style = {{flex:1,alignItems: 'center'}}
-            onPress = {() => this.props.navigation.navigate('UserEvents')}
+            onPress = {() => this.props.navigation.navigate('UserEventsScreen')}
             >
                 <Text style = {{fontWeight: 'bold',fontSize: 18,fontFamily:'sans-serif'}}>
                     {this.props.title}

@@ -3,7 +3,7 @@ import QRScanningScreen from "./screens/QRScanningScreen";
 import BeaconScanningScreen from "./screens/BeaconScanningScreen";
 import LoginScreen from "./screens/LoginScreen";
 import SignupScreen from "./screens/SignupScreen";
-import UserEvents from "./screens/UserEvents";
+import UserEventsScreen from "./screens/UserEventsScreen";
 
 export default Routes = {
     mainApp: {
@@ -16,8 +16,8 @@ export default Routes = {
         BeaconScanningScreen: {
             screen: BeaconScanningScreen
         },
-        UserEvents: {
-            screen: UserEvents
+        UserEventsScreen: {
+            screen: UserEventsScreen
         },
     },
 
