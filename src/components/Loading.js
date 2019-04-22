@@ -1,7 +1,7 @@
 import React,{Component} from 'react';
 import { View, Text, ActivityIndicator, Modal } from 'react-native';
 
-export default class SyncingDatabases extends React.PureComponent {
+export default class Loading extends React.PureComponent {
 
     constructor(props){
         super(props);
@@ -26,7 +26,7 @@ export default class SyncingDatabases extends React.PureComponent {
             >
                 <View style={styles.syncing}>
                     <Text style = {{fontSize: 18,fontWeight: 'bold'}}>
-                        Syncing Databases
+                        {this.props.text}
                     </Text>
                     <ActivityIndicator size = {50} color="#0000ff" />
                 </View>

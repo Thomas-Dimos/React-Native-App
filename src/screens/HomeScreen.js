@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {StyleSheet, View,TouchableOpacity,Image, Text,PermissionsAndroid,Alert } from 'react-native';
 import localDatabase from '../SQLiteDatabase';
-import SyncingDatabases from '../components/SyncingDatabases'
+import Loading from '../components/Loading'
 import AsyncStorage from '@react-native-community/async-storage';
 import NetInfo from "@react-native-community/netinfo";
 
@@ -17,7 +17,7 @@ class HeaderTitle extends Component {
         return (
             <TouchableOpacity
             style = {{flex:1,alignItems: 'center'}}
-            onPress = {() => this.props.navigation.navigate('UserEventsScreen')}
+            onPress = {() => this.props.navigation.navigate('UserEventsScreen',{user: this.props.title})}
             >
                 <Text style = {{fontWeight: 'bold',fontSize: 18,fontFamily:'sans-serif'}}>
                     {this.props.title}
@@ -122,7 +122,7 @@ export default class HomeScreen extends React.Component {
             return (
                 <View style={styles.container}>
 
-                    <SyncingDatabases visible= {this.state.showLoading}/>
+                    <Loading visible= {this.state.showLoading} text = "Syncing Databases"/>
                     
                     <View style={styles.map}>
     
@@ -130,7 +130,7 @@ export default class HomeScreen extends React.Component {
     
                     <View style={styles.buttons}>
     
-                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('BeaconScanningScreen',{token: this.accessToken})}>
+                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('BeaconScanningScreen')}>
     
                             <Image
                                 style = {{flex: 0.2,aspectRatio: 1.5}}
@@ -144,7 +144,7 @@ export default class HomeScreen extends React.Component {
     
                         </TouchableOpacity>
     
-                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('QRscanningScreen',{token: this.accessToken})}>
+                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('QRscanningScreen')}>
     
                             <Image
                                 style = {{flex: 0.2, aspectRatio: 1.5}}

@@ -5,7 +5,6 @@ import Event from '../events/Event';
 import localDatabase from '../SQLiteDatabase';
 import HttpRequest from '../HTTPRequest';
 import NetInfo from "@react-native-community/netinfo";
-import AsyncStorage from '@react-native-community/async-storage';
 
 //Fix Netinfo dependence by using a state manager
 
@@ -28,7 +27,7 @@ export default class QRScanningScreen extends React.Component{
             location = await QREvent.getLocation();
             QREvent.setLocation(location);
             QREvent.setEventsTimestamp(QREvent.getEventsTimestamp());
-            user =  await AsyncStorage.getItem('currentUser');
+            user =  this.props.navigation.getParam('title');
             await localDatabase.registerEvent(user,QREvent);
             lastEventID =  await localDatabase.getLastEventID();
             isConnected = await NetInfo.isConnected.fetch();

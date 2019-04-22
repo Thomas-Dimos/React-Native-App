@@ -25,7 +25,7 @@ export default class Event {
 
     getEventsTimestamp = () => {
         curDate = new Date();
-        return `${curDate.getDate()}/${curDate.getMonth()+1}/${curDate.getFullYear()} @ ${curDate.getHours()}:${curDate.getMinutes()}:${curDate.getSeconds()}`
+        return `${curDate.getMonth()+1}/${curDate.getDate()}/${curDate.getFullYear()} ${curDate.getHours()}:${curDate.getMinutes()}:${curDate.getSeconds()}`
     }
 
     setEventsTimestamp = (timestamp) => {

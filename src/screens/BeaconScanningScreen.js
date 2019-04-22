@@ -7,7 +7,6 @@ import localDatabase from '../SQLiteDatabase';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import NetInfo from "@react-native-community/netinfo";
 import HttpRequest from '../HTTPRequest';
-import AsyncStorage from '@react-native-community/async-storage';
 
 export default class BeaconScanningScreen extends React.Component {
     constructor() {
@@ -123,7 +122,7 @@ export default class BeaconScanningScreen extends React.Component {
             location = await beaconEvent.getLocation();
             beaconEvent.setLocation(location);
             beaconEvent.setEventsTimestamp(beaconEvent.getEventsTimestamp());
-            user =  await AsyncStorage.getItem('currentUser');
+            user =  this.props.navigation.getParam('title');
             await localDatabase.registerEvent(user,beaconEvent);
             lastEventID =  await localDatabase.getLastEventID();
             isConnected = await NetInfo.isConnected.fetch();

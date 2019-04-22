@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-community/async-storage';
 import Event from './events/Event';
 import localDatabase from './SQLiteDatabase';
 
@@ -35,20 +34,27 @@ class HTTPRequest{
             }
         }
         request.open(method,URL,true);
-        if(data instanceof Event){
+        if(!data){
             localDatabase.getToken(user,'accessToken').then((accessToken) => {
                 request.setRequestHeader('x-access-token',accessToken);
-                request.setRequestHeader('Content-Type','application/json');
-                request.send(data.dataToJSON());
+                request.send();
             });
-        }else if (typeof(data) === 'string'){
-            console.log("refreshToken is sent");
-            request.setRequestHeader('x-access-token',data);
-            request.send();
-        }else{
-            request.setRequestHeader('Content-Type','application/json');
-            dataToSend = JSON.stringify(data);
-            request.send(dataToSend);
+        }else {
+            if(data instanceof Event){
+                localDatabase.getToken(user,'accessToken').then((accessToken) => {
+                    request.setRequestHeader('x-access-token',accessToken);
+                    request.setRequestHeader('Content-Type','application/json');
+                    request.send(data.dataToJSON());
+                });
+            }else if (typeof(data) === 'string'){
+                console.log("refreshToken is sent");
+                request.setRequestHeader('x-access-token',data);
+                request.send();
+            }else{
+                request.setRequestHeader('Content-Type','application/json');
+                dataToSend = JSON.stringify(data);
+                request.send(dataToSend);
+            }
         }
    });
 
