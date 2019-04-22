@@ -134,7 +134,7 @@ export default class BeaconScanningScreen extends React.Component {
             console.log(error);
             return;
         }
-        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/BeaconEvents/new',user,beaconEvent).then((res) =>{
+        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/Events/new',user,beaconEvent).then((res) =>{
             if (res.status === 200){
                 
                 Alert.alert('Beacon Event was successfully stored in database');

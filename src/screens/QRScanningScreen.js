@@ -40,7 +40,7 @@ export default class QRScanningScreen extends React.Component{
             console.log(error);
             return;
         }
-        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/QREvents/new',user,QREvent).then((res) =>{
+        HttpRequest.sendHTTPRequest('POST','http://192.0.3.76:9999/User/Events/new',user,QREvent).then((res) =>{
             if (res.status === 200){
                 Alert.alert('QR Event was successfully stored in database');
             }

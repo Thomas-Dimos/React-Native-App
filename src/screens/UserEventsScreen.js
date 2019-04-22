@@ -34,7 +34,7 @@ export default class UserEventsScreen extends Component {
     }
 
     componentDidMount(){
-        HttpRequest.sendHTTPRequest('GET','http://192.0.3.76:9999/User/BeaconEvents/',this.user,null).then((res) =>{
+        HttpRequest.sendHTTPRequest('GET','http://192.0.3.76:9999/User/Events',this.user,null).then((res) =>{
             for (let i = 0; i < res.response.length; i++){
                 item = JSON.parse(res.response[i]);
                 this.items[i].push(item);
