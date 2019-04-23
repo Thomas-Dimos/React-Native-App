@@ -18,24 +18,28 @@ import HttpRequest from './HTTPRequest';
         console.log('Error opening Database');
     }
 
+    getUserEvents = (user) => new Promise ((resolve,reject) => {
+        this.db.transaction((tx) => {
+            tx.executeSql(`SELECT eventType, timeStamp, speed, heading, accuracy, altitude, longitude, latitude, data FROM Event WHERE user = "${user}"`,[], (tx,results) => {
+                const items = [];
+                for (let i = 0; i < results.rows.length; i++){
+                    item = results.rows.item(i);
+                    itemObj = {"timeStamp" : item.timeStamp,"location" : {"speed" : item.speed,"heading" : item.heading,"accuracy" : item.accuracy,"altitude": item.altitude, "longitude": item.longitude, "latitude" : item.latitude},"eventType" : item.eventType, "data" : item.data};
+                    items.push(itemObj);
+                    resolve(items);
+                }
+            })
+        },(error) => reject(error));
+    })
+
     seeEventDatabase = (tx) => {
         
-        tx.executeSql('SELECT * FROM Event ',[],(tx,results) => {
+        tx.executeSql('SELECT * FROM Event',[],(tx,results) => {
             for (let i = 0; i < results.rows.length; i++) {
                 console.log(results.rows.item(i));
             }
         });
     }
-
-    /*seeUnsentEventDatabase = () => {
-        this.db.transaction((tx) => {
-            tx.executeSql('SELECT * FROM UnsentEvents ',[],(tx,results) => {
-                for (let i = 0; i < results.rows.length; i++) {
-                    console.log(results.rows.item(i));
-                }
-            })
-        });
-    }*/
 
     isDatabasesSynced = (user) => new Promise ((resolve,reject) => {
         this.db.transaction((tx) => {
@@ -127,10 +131,6 @@ import HttpRequest from './HTTPRequest';
 
             console.log('All trasactions are finished');
         },(error)=>{console.log(error)},()=>{
-            //this.seeUnsentEventDatabase();
-           // console.log("-------------------------");
-           // this.seeStuff();
-           // this.db.transaction(this.seeEventDatabase);
         });
     }
 
