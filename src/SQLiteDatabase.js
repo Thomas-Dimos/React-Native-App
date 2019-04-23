@@ -54,12 +54,6 @@ import HttpRequest from './HTTPRequest';
         let eventsSynced = 0;
         this.db.transaction((tx) => {
             tx.executeSql(`SELECT Event_id, eventType, timeStamp, speed, heading, accuracy, altitude, longitude, latitude, data FROM Event,UnsentEvents WHERE Event_id = UnsentEvent_id AND user = "${user}"`,[],(tx,results) => {
-                if(results.rows.length === 0){
-                    console.log('Databases are synchronized');
-                    resolve();
-                    return;
-                }
-
                 for(let i = 0; i < results.rows.length; i++ ){
                     const newEvent = new Event(results.rows.item(i).data,results.rows.item(i).eventType);
                     newEvent.setLocation({coords: {speed: results.rows.item(i).speed,heading: results.rows.item(i).heading, accuracy: results.rows.item(i).accuracy, altitude: results.rows.item(i).altitude, longitude: results.rows.item(i).longitude, latitude: results.rows.item(i).latitude}});

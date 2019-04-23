@@ -1,7 +1,7 @@
 import React,{Component} from 'react';
 import { View, Text, ActivityIndicator, Modal } from 'react-native';
 
-export default class Loading extends React.PureComponent {
+export default class Loading extends React.Component {
 
     constructor(props){
         super(props);
@@ -12,11 +12,18 @@ export default class Loading extends React.PureComponent {
 
     static getDerivedStateFromProps(props, state) {
         const newState = {};
-        if (state.isShowing !== props.visible) 
+        if (state.isShowing !== props.visible){
             newState.isShowing = props.visible;
-    
+        }
+
         return newState;
-      }
+    }
+
+    componentDidUpdate(prevProps, prevState){
+        if(prevState.isShowing !== this.state.isShowing){
+            this.setState({isShowing : !this.state.showLoading});
+        }
+    }
 
     render(){
         return (

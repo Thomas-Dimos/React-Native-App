@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text,TouchableHighlight,ScrollView } from 'react-native';
+import {View, Text,TouchableHighlight,ScrollView,StyleSheet } from 'react-native';
 import HttpRequest from '../HTTPRequest';
 import Loading from '../components/Loading';
 
@@ -11,34 +11,29 @@ class EventVisualizationItem extends Component{
 
     render(){
         return(
-            <View style = {{justifyContent: "space-evenly"}}>
-                <Text>
-                    {
-                        this.props.event
-                    }
-                </Text>
-            </View>
+            <Text>
+                {
+                    this.props.event
+                }
+            </Text>
+
         )
     }
 }
 
 export default class UserEventsScreen extends Component {
 
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.state = {
             dataFetched: false,
         }
         this.user = this.props.navigation.getParam('user');
-        this.items = [];
     }
 
     componentDidMount(){
         HttpRequest.sendHTTPRequest('GET','http://192.0.3.76:9999/User/Events',this.user,null).then((res) =>{
-            for (let i = 0; i < res.response.length; i++){
-                item = JSON.parse(res.response[i]);
-                this.items[i].push(item);
-            }
+            this.items = res.response;
             this.setState({dataFetched: true});
         });
     }
@@ -52,13 +47,12 @@ export default class UserEventsScreen extends Component {
         return(
 
             <View style = {styles.mainContainer}>
-                <ScrollView>
-                    {
-                        this.items.map((item) =>
-                            (
-                                <EventVisualizationItem event = {item}/>
-                            ))
-                    }
+                <ScrollView style = {styles.scrollView}>
+                    <Text>
+                        {
+                            this.items
+                        }
+                    </Text>
                 </ScrollView>
             </View>
             
@@ -66,3 +60,11 @@ export default class UserEventsScreen extends Component {
         )
     }
 }
+
+const styles = StyleSheet.create({
+
+    mainContainer: {
+        flexDirection: 'column',
+        flex: 1,
+    }
+});
