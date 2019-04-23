@@ -197,14 +197,14 @@ import HttpRequest from './HTTPRequest';
     })
 
     registerEvent = (user,event) => new Promise ((resolve,reject) => {
-      
+      console.log(user);
         this.db.transaction((tx) => {
             tx.executeSql(`INSERT INTO Event (user, eventType, timeStamp, speed, heading, accuracy, altitude, longitude, latitude, data) VALUES ("${user}", "${event.eventType}", "${event.getEventsTimestamp()}", ${event.location.coords.speed}, ${event.location.coords.heading}, ${event.location.coords.accuracy}, ${event.location.coords.altitude}, ${event.location.coords.longitude}, ${event.location.coords.latitude}, "${event.data}");`,[]);
         },(error)=>{
             reject("Error registering the Event in local Database " + error)
         },
         ()=>{
-            this.db.transaction(this.seeEventDatabase);
+            //this.db.transaction(this.seeEventDatabase);
             resolve();
         });
     });

@@ -28,7 +28,9 @@ export default class QRScanningScreen extends React.Component{
             QREvent.setLocation(location);
             QREvent.setEventsTimestamp(QREvent.getEventsTimestamp());
             user =  this.props.navigation.getParam('title');
+            
             await localDatabase.registerEvent(user,QREvent);
+            console.log(this.props.navigation);
             lastEventID =  await localDatabase.getLastEventID();
             isConnected = await NetInfo.isConnected.fetch();
             if(!isConnected) {

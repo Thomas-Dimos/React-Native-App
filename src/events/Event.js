@@ -33,7 +33,7 @@ export default class Event {
     }
 
     dataToJSON = () => {
-        const data = {"timeStamp": this.timestamp,"location": this.location.coords,"data":this.data};
+        const data = {"timeStamp": this.timestamp,"location": this.location.coords,"eventType":this.eventType,"data":this.data};
         return JSON.stringify(data);
     }
 
