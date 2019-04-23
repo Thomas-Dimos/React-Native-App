@@ -130,7 +130,7 @@ export default class HomeScreen extends React.Component {
     
                     <View style={styles.buttons}>
     
-                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('BeaconScanningScreen')}>
+                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('BeaconScanningScreen',{title: this.props.navigation.getParam("title")})}>
     
                             <Image
                                 style = {{flex: 0.2,aspectRatio: 1.5}}
@@ -144,7 +144,7 @@ export default class HomeScreen extends React.Component {
     
                         </TouchableOpacity>
     
-                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('QRscanningScreen')}>
+                        <TouchableOpacity onPress = {() => this.props.navigation.navigate('QRscanningScreen',{title: this.props.navigation.getParam("title")})}>
     
                             <Image
                                 style = {{flex: 0.2, aspectRatio: 1.5}}
